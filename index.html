@@ -52,28 +52,29 @@ let gameOverSoundPlayed = false;
 let music, gunshot, reloadSound, overSound;
 
 // ------- SETUP ------- //
-function preload() {
+function setup() {
+  createCanvas(550, 450);
   music = loadSound("gameMusic.mp3");
   gunshot = loadSound("shotgunSound.wav");
   reloadSound = loadSound("reloadSound.wav");
   overSound = loadSound("over.wav");
+  music.loop();
+
+  p = new Player();
+  font = createFont("orbitronRegular.ttf", 18);
+  textFont(font);
 
   playerImg = loadImage("player.png");
+  
   shootImg = loadImage("shoot.png");
   bulletImg = loadImage("bullet.png");
 
   zombieImg = loadImage("zombie.png");
+  zombieImg.resize(260,180);
   bigZombieImg = loadImage("big.png");
+  bigZombieImg.resize(280,200);
   fastZombieImg = loadImage("fast.png");
-}
-
-function setup() {
-  createCanvas(550, 450);
-
-  music.loop();
-  p = new Player();
-  font = createFont("orbitronRegular.ttf", 18);
-  textFont(font);
+  fastZombieImg.resize(180,100);
 }
 
 // ------- DRAW LOOP ------- //
