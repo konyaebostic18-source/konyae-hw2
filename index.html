@@ -8,12 +8,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
 </head>
-<body style="margin:0; background:black;">
+<body style="margin:0;">
 
 <script>
-// =======================
-// GAME VARIABLES
-// =======================
+
+//===GAME VARIABLES===
 let p;
 let zombies = [];
 let bullets = [];
@@ -80,10 +79,8 @@ function draw() {
   updateBullets();
   handleBulletZombieCollision();
 }
-
-// =======================
-// SCREENS
-// =======================
+  
+//===SCREENS===
 function startScreen() {
   fill(255,0,0);
   textAlign(CENTER,CENTER);
@@ -116,10 +113,6 @@ function gameOverScreen() {
   fill(255);
   text("Press R to Restart", width/2, height/2+30);
 }
-
-// =======================
-// HUD / UI
-// =======================
 function drawHUD() {
   fill(255);
   textAlign(LEFT,TOP);
@@ -142,9 +135,7 @@ function flashEffect() {
   }
 }
 
-// =======================
-// GAME LOGIC
-// =======================
+//===GAME LOGIC===
 function handleReload() {
   if (reloading && millis() - reloadStart >= reloadTime) {
     ammo = maxAmmo;
