@@ -51,7 +51,6 @@ let gameOverSoundPlayed = false;
 // audio
 let music, gunshot, reloadSound, overSound;
 
-// ------- SETUP ------- //
 function setup() {
   createCanvas(550, 450);
   music = loadSound("gameMusic.mp3");
@@ -77,20 +76,26 @@ function setup() {
   fastZombieImg.resize(180,100);
 }
 
-// ------- DRAW LOOP ------- //
 function draw() {
   background(0);
 
-  if (!gameStarted) { startScreen(); return; }
-
+  if (!gameStarted) { 
+    startScreen(); 
+    return; 
+  }
+  
+//in game text
   fill(255);
   textAlign(LEFT, TOP);
   text("Score: " + score, 5, 5);
   text("Ammo: " + ammo + (reloading ? " (Reloading...)" : ""), 5, 420);
   text("Health: " + pHealth, 5, 25);
 
+// If game over, stop game and show message
   if (gameOver) {
-    if (music.isPlaying()) music.pause();
+    if (music.isPlaying()) {
+      music.pause();
+    }
     if (!gameOverSoundPlayed){
       overSound.play();
       gameOverSoundPlayed = true;
@@ -111,6 +116,7 @@ function draw() {
     text("Press R to Reload", width/2, height/2);
   }
 
+  // Flash screen borders if trigger is active
   if (flash){
     flashTimer++;
     strokeWeight(30);
@@ -122,9 +128,10 @@ function draw() {
       flash = false;
     }
   }
-
+//spawn zombies
   if (frameCount % spawnRate === 0){
     zombies.push(new Zombie());
+//increase spawnrate every 4000 points
     if (score >= nextScoreMilestone){
       spawnRate = max(fastestSpawnRate, spawnRate - 30);
       nextScoreMilestone += 4000;
