@@ -77,6 +77,9 @@ function setup() {
   textFont(font);
   p = new Player();
   music.loop();
+  zombieImg.resize(260,180);
+  bigZombieImg.resize(280,200);
+  fastZombieImg.resize(180,100);
 }
 
 function draw() {
@@ -165,8 +168,11 @@ function draw() {
   // bullet hit detection
   for (let i = bullets.length-1; i >= 0; i--) {
     let b = bullets[i];
-    let hit = false;
-
+    b.update();
+    b.display();
+    if (b.y < 0) {
+    bullets.splice(i, 1);
+  }
     for (let j = zombies.length-1; j >= 0; j--) {
       let z = zombies[j];
       if (abs(b.x - z.x) < 30 && abs(b.y - z.y) < 30) {
@@ -214,38 +220,48 @@ function gameOverScreen() {
 // ===== CLASSES =====
 class Player {
   constructor() {
-    this.x = width/2;
-    this.y = height-60;
+    this.slotWidth = width / 5;
+    this.currentSlot = 2;
+    this.x = this.currentSlot * this.slotWidth + this.slotWidth / 2;
+    this.y = 420;
+    this.health = 3;
+    this.isHit = false;
   }
-  moveLeft() { this.x = max(40, this.x-10); }
-  moveRight() { this.x = min(width-40, this.x+10); }
-  display() { image(shootMode ? shootImg : playerImg, this.x-40, this.y-40,80,80); }
-}
 
-class Zombie {
-  constructor() {
-    this.y = 0;
-    this.slot = floor(random(0,5));
-    this.x = width/5 * this.slot + width/10;
-    let r = random(1);
-    if (r < 0.6) { this.type="normal"; this.hp=2; this.speed=2; this.img=zombieImg; }
-    else if (r < 0.85) { this.type="big"; this.hp=4; this.speed=1; this.img=bigZombieImg; }
-    else { this.type="fast"; this.hp=1; this.speed=4; this.img=fastZombieImg; }
+  display() {
+    // update x based on slot
+    this.x = this.currentSlot * this.slotWidth + this.slotWidth / 2;
+
+    imageMode(CENTER);
+    if (shootMode) {
+      image(shootImg, this.x, this.y, 360, 280);
+    } else {
+      image(playerImg, this.x, this.y, 340, 260);
+    }
   }
-  update() { this.y += this.speed; }
-  display() { image(this.img, this.x-60, this.y-40); }
-  takeDamage() { this.hp--; }
-  isDead() { return this.hp <= 0; }
-  scoreValue() { return this.type=="normal"?100:this.type=="big"?200:150; }
+
+  takeDamage() {
+    this.health--;
+    this.isHit = true;
+
+    // trigger screen flash if taking damage (optional)
+    flash = true;
+  }
+
+  moveLeft() {
+    if (this.currentSlot > 0) {
+      this.currentSlot--;
+    }
+  }
+
+  moveRight() {
+    if (this.currentSlot < 4) {
+      this.currentSlot++;
+    }
+  }
 }
 
-class Bullet {
-  constructor(x,y) { this.x = x; this.y = y; }
-  update() { this.y -= 8; }
-  display() { image(bulletImg,this.x-10,this.y-10,20,20); }
-}
-
-// ===== INPUT =====
+  // ===== INPUT =====
 function keyPressed() {
   if (keyCode === LEFT_ARROW) p.moveLeft();
   if (keyCode === RIGHT_ARROW) p.moveRight();
@@ -282,6 +298,101 @@ function restartGame() {
   gameOver = false;
   gameOverSoundPlayed = false;
   music.loop();
+}
+class Zombie {
+  constructor() {
+    this.y = 0;
+    this.slotWidth = width / 5;
+    this.slot = int(random(0, 5)); 
+
+    // random spawn type logic
+    let r = int(random(100));
+
+    if (r < 50) { 
+      this.type = "normal";
+      this.img = zombieImg;
+      this.health = 3;
+      this.speed = 1.2;
+    } 
+    else if (r < 65) { 
+      this.type = "big";
+      this.img = bigZombieImg;
+      this.health = 6;
+      this.speed = 1;
+    } 
+    else { 
+      this.type = "fast";
+      this.img = fastZombieImg;
+      this.health = 1;
+      this.speed = 2;
+    }
+
+    this.isHit = false;
+    this.hitTimer = 0;
+  }
+
+  update() {
+    this.y += this.speed;
+
+    // hit flash duration
+    if (this.isHit && millis() - this.hitTimer > 90) {
+      this.isHit = false;
+    }
+
+    // triggers screen flash when crossing bottom
+    if (this.y >= 450 && this.y < 460) {
+      flash = true;
+    }
+  }
+
+  display() {
+    let x = this.slot * this.slotWidth + this.slotWidth / 2;
+
+    imageMode(CENTER);
+
+    if (this.isHit) {
+      tint(255, 0, 0, 255); // red flash
+    } else {
+      noTint();
+    }
+
+    image(this.img, x, this.y);
+    noTint(); 
+  }
+
+  takeDamage() {
+    this.health--;
+    this.isHit = true;
+    this.hitTimer = millis();
+  }
+
+  isDead() {
+    return this.health <= 0;
+  }
+
+  getX() {
+    return this.slot * this.slotWidth + this.slotWidth / 2;
+  }
+}
+  
+class Bullet {
+  constructor(startX, startY) {
+    this.x = startX;
+    this.y = startY;
+    this.speed = 9;
+  }
+
+  update() {
+    this.y -= this.speed;
+  }
+
+  display() {
+    imageMode(CENTER);
+    if (bulletImg) {
+      image(bulletImg, this.x, this.y, 115, 115);
+    }
+  }
+}
 }
 </script>
 
