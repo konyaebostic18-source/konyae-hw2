@@ -258,33 +258,19 @@ class Zombie {
 
   update() { 
     this.y += this.speed; 
-    if (this.isHit && millis() - this.hitTimer > 90) {
-    this.isHit = false;
-    }
-      
-}
-
-    // Check if zombie hits bottom
-    if (y >= 450 && y < 460) {
-      flash = true;
-    }
   }
+  
   display() { 
     imageMode(CENTER); 
-  if (this.isHit) {
-    tint(255, 0, 0, 255); // full red tint
-  } else {
-    noTint();
-  }
-    image(this.img, this.getX(), this.y); 
-  }
-  hit() { 
-    this.health--; if (this.health <= 0) this.dead = true; 
-  }
+    image(this.img, this.getX(), this.y); }
+      hit() { 
+        this.health--; if (this.health <= 0) this.dead = true; 
+      }
   getX() { 
     return this.slot * this.slotWidth + this.slotWidth / 2; 
   }
 }
+
 
 class Bullet {
   constructor(x, y) { this.x = x; this.y = y; this.speed = 9; }
