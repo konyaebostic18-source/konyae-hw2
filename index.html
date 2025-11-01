@@ -183,10 +183,12 @@ function startScreen() {
 }
 
 function gameOverScreen() {
+  push();
   textAlign(CENTER);
   fill("red"); textSize(40);
+  noStroke();
   text("GAME OVER", width/2, height/2 - 30);
-  textSize(20); fill(255);
+  textSize(20); fill(255); noStroke();
   text("Press R to Restart", width/2, height/2 + 30);
 }
 
