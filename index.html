@@ -57,7 +57,9 @@ function preload() {
   playerImg = loadImage("player.png");
   shootImg = loadImage("shoot.png");
   bulletImg = loadImage("bullet.png");
+  
   zombieImg = loadImage("zombie.png");
+  
   bigZombieImg = loadImage("big.png");
   fastZombieImg = loadImage("fast.png");
 
@@ -75,6 +77,9 @@ function setup() {
 
   music.loop();
   p = new Player();
+  zombieImg.resize(260,180);
+  bigZombieImg.resize(280,200);
+  fastZombieImg.resize(180,100);
 }
 
 // ------- DRAW LOOP ------- //
@@ -82,7 +87,6 @@ function draw() {
   background(0);
 
   if (!gameStarted) { startScreen(); return; }
-
   fill(255);
   textAlign(LEFT, TOP);
   text("Score: " + score, 5, 5);
@@ -117,13 +121,17 @@ function draw() {
 
   // Flash borders (damage indicator)
   if (flash) {
-    flashTimer++;
-    strokeWeight(30);
-    stroke(255, 0, 0, 200);
-    noFill();
-    rect(width / 2, height / 2, width, height);
-    if (flashTimer >= flashDuration) { flash = false; flashTimer = 0; }
+  flashTimer++;
+  noFill();
+  stroke(255, 0, 0, 200);
+  strokeWeight(20); 
+  rect(0, 0, width, height);
+
+  if (flashTimer >= flashDuration) {
+    flash = false;
+    flashTimer = 0;
   }
+}
 
   // Update zombies
   for (let i = zombies.length - 1; i >= 0; i--) {
@@ -138,6 +146,7 @@ function draw() {
       zombies.splice(i, 1);
       pHealth--;
       flash = true;
+      flashTimer = 0
       if (pHealth <= 0) gameOver = true;
     }
   }
@@ -174,8 +183,14 @@ function startScreen() {
   fill("red"); textSize(40);
   text("END OF THE WORLD", width/2, height/2 - 80);
 
+  fill(255); textSize(20);
+  text("Controls:", width / 2, height / 2 - 20);
+
   fill(255); textSize(15);
-  text("← → Move | SPACE Shoot | R Reload", width/2, height/2 + 70);
+  text("Right/Left Arrows:  Move", width/2, height/2 + 10);
+  text("SPACE:  Shoot", width/2, height/2 + 40);
+  text("R:  Reload", width/2, height/2 + 70);
+  
 
   textSize(20);
   text("Press ENTER to Start", width/2, height/2 + 120);
@@ -264,7 +279,9 @@ class Zombie {
     else { this.type = "fast"; this.img = fastZombieImg; this.health = 1; this.speed = 2; this.points = 150; }
   }
 
-  update() { this.y += this.speed; }
+  update() { 
+    this.y += this.speed; 
+  }
 
   display() {
     imageMode(CENTER);
@@ -282,9 +299,15 @@ class Zombie {
 }
 
 class Bullet {
-  constructor(x, y) { this.x = x; this.y = y; this.speed = 9; }
-  update() { this.y -= this.speed; }
-  display() { imageMode(CENTER); image(bulletImg, this.x, this.y, 115, 115); }
+  constructor(x, y) { 
+   this.x = x; this.y = y; this.speed = 9; 
+  }
+  update() { 
+    this.y -= this.speed; 
+  }
+  display() { 
+    imageMode(CENTER); 
+    image(bulletImg, this.x, this.y, 115, 115); }
 }
 </script>
 
