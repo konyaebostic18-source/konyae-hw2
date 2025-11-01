@@ -226,8 +226,9 @@ function keyPressed() {
       reloadSound.play();
     }
   }
-
-  if (!gameStarted && keyCode === ENTER) gameStarted = true;
+   if (gameStarted && keyCode === ENTER) {
+    gameStarted = true;
+  }
 }
 
 function keyReleased() {
