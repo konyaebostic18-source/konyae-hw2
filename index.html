@@ -124,12 +124,19 @@ function draw() {
   // Flash borders (damage indicator)
   if (flash) {
     flashTimer++;
-     push();               
-  strokeWeight(30);
-  stroke(255, 0, 0, 200);
-  noFill();
-  rect(0, 0, width, height);
-  pop();                 
+     const bw = 30;
+  push();
+  noStroke();
+  fill(255, 0, 0, 200); 
+  // top
+  rect(0, 0, width, bw);
+  // bottom
+  rect(0, height - bw, width, bw);
+  // left
+  rect(0, 0, bw, height);
+  // right
+  rect(width - bw, 0, bw, height);
+  pop();
 
   if (flashTimer >= flashDuration) { 
     flash = false; 
@@ -190,7 +197,7 @@ function startScreen() {
   text("END OF THE WORLD", width/2, height/2 - 80);
 
   fill(255); textSize(20);
-  text("CONTROLS");
+  text("CONTROLS", width/2, height/2 - 50);
   
   fill(255); textSize(15);
   text("RIGHT/LEFT Arrow: Move | SPACE: Shoot | R: Reload", width/2, height/2 + 70);
