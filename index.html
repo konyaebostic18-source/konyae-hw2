@@ -9,20 +9,25 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
 
   <style>
-    body { margin: 0; display:flex; justify-content:center; }
+    body { margin: 0; display:flex; justify-content:center; background:black; }
     canvas { border:2px solid white; margin-top:20px; }
   </style>
 </head>
 <body>
 
 <script>
+// ------- ASSETS ------- //
+let playerImg, shootImg, bulletImg;
+let zombieImg, bigZombieImg, fastZombieImg;
+let font;
+
+// ------- AUDIO ------- //
+let music, gunshot, reloadSound, overSound;
+
 // ------- GAME VARIABLES ------- //
 let p;
 let zombies = [];
 let bullets = [];
-
-let playerImg, shootImg, bulletImg;
-let zombieImg, bigZombieImg, fastZombieImg;
 
 let shootMode = false;
 let ammo = 6;
@@ -40,63 +45,53 @@ let fastestSpawnRate = 60;
 let nextScoreMilestone = 4000;
 
 let score = 0;
-let font;
-
 let gameStarted = false;
-
 let pHealth = 3;
 let gameOver = false;
 let gameOverSoundPlayed = false;
 
-// audio
-let music, gunshot, reloadSound, overSound;
+// ------- LOAD FILES ------- //
+function preload() {
+  font = loadFont("orbitronRegular.ttf");
 
-function setup() {
-  createCanvas(550, 450);
+  playerImg = loadImage("player.png");
+  shootImg = loadImage("shoot.png");
+  bulletImg = loadImage("bullet.png");
+  zombieImg = loadImage("zombie.png");
+  bigZombieImg = loadImage("big.png");
+  fastZombieImg = loadImage("fast.png");
+
   music = loadSound("gameMusic.mp3");
   gunshot = loadSound("shotgunSound.wav");
   reloadSound = loadSound("reloadSound.wav");
   overSound = loadSound("over.wav");
-  music.loop();
-
-  p = new Player();
-  font = createFont("orbitronRegular.ttf", 18);
-  textFont(font);
-
-  playerImg = loadImage("player.png");
-  
-  shootImg = loadImage("shoot.png");
-  bulletImg = loadImage("bullet.png");
-
-  zombieImg = loadImage("zombie.png");
-  zombieImg.resize(260,180);
-  bigZombieImg = loadImage("big.png");
-  bigZombieImg.resize(280,200);
-  fastZombieImg = loadImage("fast.png");
-  fastZombieImg.resize(180,100);
 }
 
+// ------- SETUP ------- //
+function setup() {
+  createCanvas(550, 450);
+  textFont(font);
+  textSize(18);
+
+  music.loop();
+  p = new Player();
+}
+
+// ------- DRAW LOOP ------- //
 function draw() {
   background(0);
 
-  if (!gameStarted) { 
-    startScreen(); 
-    return; 
-  }
-  
-//in game text
+  if (!gameStarted) { startScreen(); return; }
+
   fill(255);
   textAlign(LEFT, TOP);
   text("Score: " + score, 5, 5);
-  text("Ammo: " + ammo + (reloading ? " (Reloading...)" : ""), 5, 420);
   text("Health: " + pHealth, 5, 25);
+  text("Ammo: " + ammo + (reloading ? " (Reloading...)" : ""), 5, 420);
 
-// If game over, stop game and show message
   if (gameOver) {
-    if (music.isPlaying()) {
-      music.pause();
-    }
-    if (!gameOverSoundPlayed){
+    if (music.isPlaying()) music.pause();
+    if (!gameOverSoundPlayed) {
       overSound.play();
       gameOverSoundPlayed = true;
     }
@@ -104,141 +99,126 @@ function draw() {
     return;
   }
 
-  // Reload
+  // Reloading logic
   if (reloading && millis() - reloadStart >= reloadTime) {
     ammo = maxAmmo;
     reloading = false;
   }
 
-  if (ammo == 0){
-    fill("red");
-    textAlign(CENTER);
-    text("Press R to Reload", width/2, height/2);
-  }
-
-  // Flash screen borders if trigger is active
-  if (flash){
-    flashTimer++;
-    strokeWeight(30);
-    stroke(255,0,0,200);
-    noFill();
-    rect(width/2,height/2,width,height);
-    if (flashTimer >= flashDuration){
-      flashTimer = 0;
-      flash = false;
-    }
-  }
-//spawn zombies
-  if (frameCount % spawnRate === 0){
+  // Spawn zombies
+  if (frameCount % spawnRate === 0) {
     zombies.push(new Zombie());
-//increase spawnrate every 4000 points
-    if (score >= nextScoreMilestone){
+
+    if (score >= nextScoreMilestone) {
       spawnRate = max(fastestSpawnRate, spawnRate - 30);
       nextScoreMilestone += 4000;
     }
   }
 
-  // Zombies update
-  for (let i = zombies.length-1; i >= 0; i--){
+  // Flash borders (damage indicator)
+  if (flash) {
+    flashTimer++;
+    strokeWeight(30);
+    stroke(255, 0, 0, 200);
+    noFill();
+    rect(width / 2, height / 2, width, height);
+    if (flashTimer >= flashDuration) { flash = false; flashTimer = 0; }
+  }
+
+  // Update zombies
+  for (let i = zombies.length - 1; i >= 0; i--) {
     let z = zombies[i];
     z.update();
     z.display();
 
-    if (z.dead){
+    if (z.dead) {
       score += z.points;
-      zombies.splice(i,1);
-    } else if(z.y > height){
-      zombies.splice(i,1);
+      zombies.splice(i, 1);
+    } else if (z.y > height) {
+      zombies.splice(i, 1);
       pHealth--;
       flash = true;
       if (pHealth <= 0) gameOver = true;
     }
   }
 
+  // Player
   p.display();
 
   // Bullets
-  for (let i=bullets.length-1;i>=0;i--){
-    bullets[i].update();
-    bullets[i].display();
-
-    if (bullets[i].y < 0) bullets.splice(i,1);
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    let b = bullets[i];
+    b.update();
+    b.display();
+    if (b.y < 0) bullets.splice(i, 1);
   }
 
-  // Bullet collision
-  for (let i = bullets.length-1; i >= 0; i--){
+  // Bullet - Zombie collision
+  for (let i = bullets.length - 1; i >= 0; i--) {
     let b = bullets[i];
-    let hit = false;
-    for (let j = zombies.length-1; j >= 0; j--){
+    for (let j = zombies.length - 1; j >= 0; j--) {
       let z = zombies[j];
-      if (abs(b.x - z.x) < 30 && abs(b.y - z.y) < 30){
+      if (dist(b.x, b.y, z.getX(), z.y) < 30) {
         z.hit();
-        hit = true;
-        if (z.dead){
-          score += z.points;
-          zombies.splice(j,1);
-        }
+        if (z.dead) zombies.splice(j, 1);
+        bullets.splice(i, 1);
         break;
       }
     }
-    if (hit) bullets.splice(i,1);
   }
 }
 
 // ------- SCREENS ------- //
-function startScreen(){
-  fill("red");
+function startScreen() {
   textAlign(CENTER);
-  textSize(40);
+  fill("red"); textSize(40);
   text("END OF THE WORLD", width/2, height/2 - 80);
-  textSize(15);
-  fill(255);
+
+  fill(255); textSize(15);
   text("← → Move | SPACE Shoot | R Reload", width/2, height/2 + 70);
+
   textSize(20);
   text("Press ENTER to Start", width/2, height/2 + 120);
 }
 
-function gameOverScreen(){
+function gameOverScreen() {
   textAlign(CENTER);
-  textSize(40);
-  fill("red");
+  fill("red"); textSize(40);
   text("GAME OVER", width/2, height/2 - 30);
-  textSize(20);
-  fill(255);
+
+  fill(255); textSize(20);
   text("Press R to Restart", width/2, height/2 + 30);
 }
 
-// ------- KEYBOARD ------- //
-function keyPressed(){
+// ------- KEY INPUT ------- //
+function keyPressed() {
   if (keyCode === LEFT_ARROW) p.move(-1);
   if (keyCode === RIGHT_ARROW) p.move(1);
 
-  if (key === ' ' && ammo > 0 && !reloading){
+  if (key === ' ' && ammo > 0 && !reloading) {
     bullets.push(new Bullet(p.x, p.y));
     ammo--;
     gunshot.play();
   }
 
-  if ((key==='r' || key==='R')){
+  if ((key === 'r' || key === 'R')) {
     if (gameOver) restartGame();
-    else if (!reloading && ammo < maxAmmo){
+    else if (!reloading && ammo < maxAmmo) {
       reloading = true;
       reloadStart = millis();
       reloadSound.play();
     }
   }
 
-  if (!gameStarted && keyCode === ENTER){
-    gameStarted = true;
-  }
+  if (!gameStarted && keyCode === ENTER) gameStarted = true;
 }
 
-function keyReleased(){
+function keyReleased() {
   if (key === ' ') shootMode = false;
 }
 
 // ------- RESTART ------- //
-function restartGame(){
+function restartGame() {
   zombies = [];
   bullets = [];
   score = 0;
@@ -249,14 +229,12 @@ function restartGame(){
   music.loop();
 }
 
-// ------Player Class--------
+// ------- CLASSES ------- //
 class Player {
   constructor() {
     this.y = 420;
     this.slotWidth = width / 5;
     this.currentSlot = 2;
-    this.health = 3;
-    this.isHit = false;
   }
 
   get x() {
@@ -264,103 +242,38 @@ class Player {
   }
 
   display() {
-    let px = this.x;
     imageMode(CENTER);
-
-    if (shootMode) {
-      image(shootImg, px, this.y, 360, 280);
-    } else {
-      image(playerImg, px, this.y, 340, 260);
-    }
+    image(shootMode ? shootImg : playerImg, this.x, this.y, 350, 250);
   }
 
-  takeDamage() {
-    this.health--;
-    this.isHit = true;
-  }
-
-  moveLeft() {
-    if (this.currentSlot > 0) this.currentSlot--;
-  }
-
-  moveRight() {
-    if (this.currentSlot < 4) this.currentSlot++;
+  move(dir) {
+    this.currentSlot = constrain(this.currentSlot + dir, 0, 4);
   }
 }
 
-// ------Zombie Class--------
 class Zombie {
   constructor() {
     this.y = 0;
     this.slotWidth = width / 5;
-    this.slot = floor(random(0, 5)); 
+    this.slot = floor(random(0, 5));
+    this.dead = false;
 
-    // Determine type
     let r = floor(random(100));
-
-    if (r < 50) { 
-      this.type = "normal";
-      this.img = zombieImg; 
-      this.health = 3; 
-      this.speed = 1.2;
-      this.points = 100;
-
-    } else if (r < 65) { 
-      this.type = "big";
-      this.img = bigZombieImg; 
-      this.health = 6; 
-      this.speed = 1;
-      this.points = 200;
-
-    } else { 
-      this.type = "fast";
-      this.img = fastZombieImg; 
-      this.health = 1; 
-      this.speed = 2;
-      this.points = 150;
-    }
-
-    this.isHit = false;
-    this.hitTimer = 0;
+    if (r < 50) { this.type = "normal"; this.img = zombieImg; this.health = 3; this.speed = 1.2; this.points = 100; }
+    else if (r < 65) { this.type = "big"; this.img = bigZombieImg; this.health = 6; this.speed = 1; this.points = 200; }
+    else { this.type = "fast"; this.img = fastZombieImg; this.health = 1; this.speed = 2; this.points = 150; }
   }
 
-  update() {
-    this.y += this.speed;
-
-    // Glow fade timer
-    if (this.isHit && millis() - this.hitTimer > 90) {
-      this.isHit = false;
-    }
-
-    // Hit floor flash
-    if (this.y >= height - 5 && this.y < height + 10) {
-      flash = true;
-    }
-  }
+  update() { this.y += this.speed; }
 
   display() {
-    let x = this.slot * this.slotWidth + this.slotWidth / 2;
-
     imageMode(CENTER);
-
-    if (this.isHit) {
-      tint(255, 0, 0, 255);
-    } else {
-      noTint();
-    }
-
-    image(this.img, x, this.y);
-
-    noTint();
+    image(this.img, this.getX(), this.y);
   }
 
   hit() {
     this.health--;
-    this.isHit = true;
-    this.hitTimer = millis();
-    if (this.health <= 0) {
-      this.dead = true;
-    }
+    if (this.health <= 0) this.dead = true;
   }
 
   getX() {
@@ -369,24 +282,12 @@ class Zombie {
 }
 
 class Bullet {
-  constructor(startX, startY) {
-    this.x = startX;
-    this.y = startY;
-    this.speed = 9;
-  }
-
-  update() {
-    this.y -= this.speed;
-  }
-
-  display() {
-    push();
-    imageMode(CENTER);
-    if (bulletImg) {
-      image(bulletImg, this.x, this.y, 115, 115);
-    }
-  }
+  constructor(x, y) { this.x = x; this.y = y; this.speed = 9; }
+  update() { this.y -= this.speed; }
+  display() { imageMode(CENTER); image(bulletImg, this.x, this.y, 115, 115); }
 }
 </script>
+
 </body>
 </html>
+
