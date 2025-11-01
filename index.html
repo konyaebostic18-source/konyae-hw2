@@ -38,7 +38,7 @@ let flash = false, flashTimer = 0, flashDuration = 30;
 let gameStarted = false, gameOver = false, gameOverSoundPlayed = false;
 let shootMode = false;
 
-//----------------- PRELOAD (p5 version of Processing preload) -----------------//
+
 function preload() {
   font = loadFont("orbitronRegular.ttf");
 
@@ -256,8 +256,26 @@ class Zombie {
     this.points = pts;
   }
 
-  update() { this.y += this.speed; }
-  display() { imageMode(CENTER); image(this.img, this.getX(), this.y); }
+  update() { 
+    this.y += this.speed; 
+    if (isHit) {
+      tint(255, 0, 0, 255); // red glow
+    } else {
+      noTint();
+    }
+    
+    if (isHit && millis() - hitTimer > 90) {
+      isHit = false;
+      
+    }
+
+    // Check if zombie hits bottom
+    if (y >= 450 && y < 460) {
+      flash = true;
+    }
+  }
+  display() { 
+    imageMode(CENTER); image(this.img, this.getX(), this.y); }
   hit() { this.health--; if (this.health <= 0) this.dead = true; }
   getX() { return this.slot * this.slotWidth + this.slotWidth / 2; }
 }
