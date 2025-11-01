@@ -124,18 +124,17 @@ function draw() {
   // Flash borders (damage indicator)
   if (flash) {
     flashTimer++;
-     const bw = 30;
   push();
   noStroke();
   fill(255, 0, 0, 200); 
   // top
-  rect(0, 0, width, bw);
+  rect(0, 0, width, 30);
   // bottom
-  rect(0, height - bw, width, bw);
+  rect(0, height - 30, width, 30);
   // left
-  rect(0, 0, bw, height);
+  rect(0, 0, 30, height);
   // right
-  rect(width - bw, 0, bw, height);
+  rect(width - 30, 0, 30, height);
   pop();
 
   if (flashTimer >= flashDuration) { 
