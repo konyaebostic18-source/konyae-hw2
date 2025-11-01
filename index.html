@@ -10,7 +10,7 @@
 
   <style>
     body { margin: 0; display:flex; justify-content:center; background:black; }
-    canvas { border:2px solid white; margin-top:20px; }
+    canvas { border:2px solid white; margin-top:50px; }
   </style>
 </head>
 <body>
@@ -84,8 +84,11 @@ function setup() {
 function draw() {
   background(0);
 
-  if (!gameStarted) { startScreen(); return; }
-
+  if (!gameStarted) { 
+    startScreen(); 
+    return; 
+  }
+  
   fill(255);
   textAlign(LEFT, TOP);
   text("Score: " + score, 5, 5);
@@ -121,12 +124,18 @@ function draw() {
   // Flash borders (damage indicator)
   if (flash) {
     flashTimer++;
-    strokeWeight(30);
-    stroke(255, 0, 0, 200);
-    noFill();
-    rect(0, 0, width, height);
-    if (flashTimer >= flashDuration) { flash = false; flashTimer = 0; }
+     push();               
+  strokeWeight(30);
+  stroke(255, 0, 0, 200);
+  noFill();
+  rect(0, 0, width, height);
+  pop();                 
+
+  if (flashTimer >= flashDuration) { 
+    flash = false; 
+    flashTimer = 0; 
   }
+}
 
   // Update zombies
   for (let i = zombies.length - 1; i >= 0; i--) {
@@ -135,9 +144,12 @@ function draw() {
     z.display();
 
     if (z.dead) {
-      score += z.points;
+      if (z.type === "normal") score += 100;
+      else if (z.type === "big") score += 200;
+      else if (z.type.=== "fast") score += 150;
       zombies.splice(i, 1);
-    } else if (z.y > height) {
+    } 
+    else if (z.y > height) {
       zombies.splice(i, 1);
       pHealth--;
       flash = true;
@@ -177,8 +189,11 @@ function startScreen() {
   fill("red"); textSize(40);
   text("END OF THE WORLD", width/2, height/2 - 80);
 
+  fill(255); textSize(20);
+  text("CONTROLS");
+  
   fill(255); textSize(15);
-  text("← → Move | SPACE Shoot | R Reload", width/2, height/2 + 70);
+  text("RIGHT/LEFT Arrow: Move | SPACE: Shoot | R: Reload", width/2, height/2 + 70);
 
   textSize(20);
   text("Press ENTER to Start", width/2, height/2 + 120);
@@ -290,7 +305,6 @@ class Bullet {
   display() { imageMode(CENTER); image(bulletImg, this.x, this.y, 115, 115); }
 }
 </script>
-
 </body>
 </html>
 
