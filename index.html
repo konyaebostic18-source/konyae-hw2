@@ -75,7 +75,9 @@ function setup() {
 function draw() {
   background(0);
 
-  // screen flash
+  if (!gameStarted) { startScreen(); return; }
+
+   // screen flash
   if (flash) {
     flashTimer++;
     strokeWeight(30);
@@ -84,14 +86,6 @@ function draw() {
     rect(0, 0, width, height);
     if (flashTimer >= flashDuration) { flash = false; flashTimer = 0; }
   }
-
-  if (!gameStarted) { startScreen(); return; }
-
-  fill(255);
-  textAlign(LEFT, TOP);
-  text("Score: " + score, 5, 5);
-  text("Health: " + pHealth, 5, 25);
-  text("Ammo: " + ammo + (reloading ? " (Reloading...)" : ""), 5, 420);
 
   if (gameOver) {
     if (music.isPlaying()) music.pause();
@@ -103,11 +97,6 @@ function draw() {
   if (reloading && millis() - reloadStart >= reloadTime) {
     ammo = maxAmmo;
     reloading = false;
-  }
-if (ammo == 0) {
-    fill(255, 0, 0);
-    textAlign(CENTER, CENTER);
-    text("R to Reload", width/2, height/2);
   }
   // spawn zombies
   if (frameCount % spawnRate === 0) {
@@ -154,6 +143,25 @@ if (ammo == 0) {
         break;
       }
     }
+  }
+
+  push();
+  noStroke();
+  fill(255);
+  textAlign(LEFT, TOP);
+  textSize(18);
+  text("Score: " + score, 5, 5);
+  text("Ammo: " + ammo + (reloading ? " (Reloading...)" : ""), 5, 420);
+  text("Health: " + pHealth, 5, 25);
+  pop();
+
+  if (ammo == 0) {
+    push();
+    textAlign(CENTER);
+    fill("red");
+    textSize(20);
+    text("Press R to Reload", width / 2, height / 2);
+    pop();
   }
 }
 
