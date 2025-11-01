@@ -143,9 +143,9 @@ function draw() {
     z.display();
 
     if (z.dead) {
-      if (z.type = "normal") score += 100;
-      else if (z.type = "big") score += 200;
-      else if (z.type. = "fast") score += 150;
+      if (z.type === "normal") score += 100;
+      else if (z.type === "big") score += 200;
+      else if (z.type. === "fast") score += 150;
       zombies.splice(i, 1);
     } 
     else if (z.y > height) {
