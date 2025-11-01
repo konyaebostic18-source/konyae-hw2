@@ -78,6 +78,7 @@ function draw() {
   if (!gameStarted) { startScreen(); return; }
 
   fill(255);
+  textAlign(LEFT, TOP);
   text("Score: " + score, 5, 5);
   text("Health: " + pHealth, 5, 25);
   text("Ammo: " + ammo + (reloading ? " (Reloading...)" : ""), 5, 420);
@@ -183,6 +184,7 @@ function keyPressed() {
 
   if (key === ' ' && ammo > 0 && !reloading) {
     bullets.push(new Bullet(p.x, p.y));
+    shootMode = true
     ammo--;
     gunshot.play();
   }
@@ -223,8 +225,11 @@ class Player {
   get x() { return this.currentSlot * this.slotWidth + this.slotWidth / 2; }
   display() {
     imageMode(CENTER);
-    let img = shootMode ? shootImg : playerImg;
-    image(img, this.x, this.y, 350, 250);
+    if (shootMode) {
+      image(shootImg, x, y, 360, 280);
+    } else {
+      image(playerImg, x, y, 340, 260);
+    }
   }
   move(dir) { this.currentSlot = constrain(this.currentSlot + dir, 0, 4); }
 }
