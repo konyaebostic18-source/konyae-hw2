@@ -258,16 +258,11 @@ class Zombie {
 
   update() { 
     this.y += this.speed; 
-    if (isHit) {
-      tint(255, 0, 0, 255); // red glow
-    } else {
-      noTint();
+    if (this.isHit && millis() - this.hitTimer > 90) {
+    this.isHit = false;
     }
-    
-    if (isHit && millis() - hitTimer > 90) {
-      isHit = false;
       
-    }
+}
 
     // Check if zombie hits bottom
     if (y >= 450 && y < 460) {
@@ -275,9 +270,20 @@ class Zombie {
     }
   }
   display() { 
-    imageMode(CENTER); image(this.img, this.getX(), this.y); }
-  hit() { this.health--; if (this.health <= 0) this.dead = true; }
-  getX() { return this.slot * this.slotWidth + this.slotWidth / 2; }
+    imageMode(CENTER); 
+  if (this.isHit) {
+    tint(255, 0, 0, 255); // full red tint
+  } else {
+    noTint();
+  }
+    image(this.img, this.getX(), this.y); 
+  }
+  hit() { 
+    this.health--; if (this.health <= 0) this.dead = true; 
+  }
+  getX() { 
+    return this.slot * this.slotWidth + this.slotWidth / 2; 
+  }
 }
 
 class Bullet {
