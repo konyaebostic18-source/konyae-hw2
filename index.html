@@ -110,7 +110,24 @@ function draw() {
     ammo = maxAmmo;
     reloading = false;
   }
+  if (ammo == 0) {
+    fill(255, 0, 0);
+    textAlign(CENTER, CENTER);
+    text("R to Reload", width/2, height/2);
+  }
 
+   // Flash borders (damage indicator)
+  if (flash) {
+    flashTimer++;
+    fill(255, 0, 0, 200); 
+    rect(0, height - 30, width, 30);
+  
+    if (flashTimer >= flashDuration) { 
+      flash = false; 
+      flashTimer = 0; 
+    }
+  }
+  
   // Spawn zombies
   if (frameCount % spawnRate === 0) {
     zombies.push(new Zombie());
@@ -120,21 +137,6 @@ function draw() {
       nextScoreMilestone += 4000;
     }
   }
-
-  // Flash borders (damage indicator)
-  if (flash) {
-    flashTimer++;
-  push();
-  noStroke();
-  fill(255, 0, 0, 200); 
-  // bottom
-  rect(0, height - 30, width, 30);
-
-  if (flashTimer >= flashDuration) { 
-    flash = false; 
-    flashTimer = 0; 
-  }
-}
 
   // Update zombies
   for (let i = zombies.length - 1; i >= 0; i--) {
@@ -174,6 +176,8 @@ function draw() {
       let z = zombies[j];
       if (dist(b.x, b.y, z.getX(), z.y) < 30) {
         z.hit();
+        tint(255, 0, 0, 255);
+        
         if (z.dead) zombies.splice(j, 1);
         bullets.splice(i, 1);
         break;
