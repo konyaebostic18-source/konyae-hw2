@@ -94,7 +94,11 @@ function draw() {
     ammo = maxAmmo;
     reloading = false;
   }
-
+if (ammo == 0) {
+    fill(255, 0, 0);
+    textAlign(CENTER, CENTER);
+    text("R to Reload", width/2, height/2);
+  }
   // spawn zombies
   if (frameCount % spawnRate === 0) {
     zombies.push(new Zombie());
