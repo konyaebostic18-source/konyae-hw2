@@ -75,6 +75,16 @@ function setup() {
 function draw() {
   background(0);
 
+  // screen flash
+  if (flash) {
+    flashTimer++;
+    strokeWeight(30);
+    stroke(255, 0, 0, 200);
+    noFill();
+    rect(0, 0, width, height);
+    if (flashTimer >= flashDuration) { flash = false; flashTimer = 0; }
+  }
+
   if (!gameStarted) { startScreen(); return; }
 
   fill(255);
@@ -108,15 +118,6 @@ if (ammo == 0) {
     }
   }
 
-  // screen flash
-  if (flash) {
-    flashTimer++;
-    strokeWeight(30);
-    stroke(255, 0, 0, 200);
-    noFill();
-    rect(0, 0, width, height);
-    if (flashTimer >= flashDuration) { flash = false; flashTimer = 0; }
-  }
 
   // update zombies
   for (let i = zombies.length - 1; i >= 0; i--) {
