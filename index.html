@@ -241,8 +241,9 @@ function restartGame() {
   ammo = maxAmmo;
   gameOver = false;
   gameOverSoundPlayed = false;
-  music.rewind();
-  music.loop();
+  if (!music.isPlaying()) {
+    music.loop();
+  }
   spawnRate = 120;           
   nextScoreMilestone = 4000; 
   
