@@ -234,9 +234,11 @@ function restartGame() {
   ammo = maxAmmo;
   gameOver = false;
   gameOverSoundPlayed = false;
+  music.loop();
+  music.rewind();
   spawnRate = 120;           
   nextScoreMilestone = 4000; 
-  music.play();
+  
 }
 
 //----------------- CLASSES -----------------//
