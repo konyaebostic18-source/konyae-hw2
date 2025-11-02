@@ -75,7 +75,10 @@ function setup() {
 function draw() {
   background(0);
 
-  if (!gameStarted) { startScreen(); return; }
+  if (!gameStarted) { 
+    startScreen(); 
+    return; 
+  }
 
    // screen flash
   if (flash) {
@@ -233,9 +236,7 @@ function restartGame() {
   gameOverSoundPlayed = false;
   spawnRate = 120;           
   nextScoreMilestone = 4000; 
-  if (!music.isPlaying()) {
-    music.loop();
-  }
+  music.isPlaying
 }
 
 //----------------- CLASSES -----------------//
