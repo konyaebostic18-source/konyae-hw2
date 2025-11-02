@@ -88,8 +88,11 @@ function draw() {
   }
 
   if (gameOver) {
-    if (music.isPlaying()) music.pause();
-    if (!gameOverSoundPlayed) { overSound.play(); gameOverSoundPlayed = true; }
+    if (music.isPlaying()) 
+      music.pause();
+  }
+    if (!gameOverSoundPlayed) { 
+      overSound.play(); gameOverSoundPlayed = true; }
     return gameOverScreen();
   }
 
@@ -228,10 +231,11 @@ function restartGame() {
   ammo = maxAmmo;
   gameOver = false;
   gameOverSoundPlayed = false;
-  music.rewind();
-  music.loop();
   spawnRate = 120;           
   nextScoreMilestone = 4000; 
+  if (!music.isPlaying()) {
+    music.loop();
+  }
 }
 
 //----------------- CLASSES -----------------//
